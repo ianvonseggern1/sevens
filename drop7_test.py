@@ -1,6 +1,7 @@
 import unittest
 from drop7 import SIZE, Game
 
+
 class TestGame(unittest.TestCase):
     def test_can_move(self):
         g = Game()
@@ -73,9 +74,10 @@ class TestGame(unittest.TestCase):
         g = Game()
         g.board[4][0] = Game.GRAY
         g.nextPiece = 2
+        g.getPiece = lambda: 4
         g.move(4)
 
-        self.assertTrue(g.board[4][0] > 0)
+        self.assertTrue(g.board[4][0] == 4)
         self.assertEqual(g.board[4][1], Game.EMPTY)
 
     def test_drop(self):
@@ -87,6 +89,32 @@ class TestGame(unittest.TestCase):
         expected = [[Game.EMPTY] * SIZE for x in range(SIZE)]
         expected[4][0] = 3
         self.assertEqual(g.board, expected)
+
+    def test_score(self):
+        g = Game()
+        g.board[0][0:3] = [4, 5, 7]
+        g.board[1][0:3] = [4, 1, 4]
+        g.board[2][0:2] = [6, 7]
+        g.board[3][0] = 3
+        g.board[4][0:2] = [6, 5]
+        g.board[6][0:3] = [5, 4, 4]
+        g.nextPiece = 5
+        g.piecesInRound = 1
+        g.score = 21
+        g.move(3)
+
+        expected = [[Game.EMPTY] * SIZE for x in range(SIZE)]
+        expected[0][0:3] = [Game.DGRAY, 4, 7]
+        expected[1][0:2] = [Game.GRAY, 1]
+        expected[2][0:3] = [Game.DGRAY, 6, 7]
+        expected[3][0:2] = [Game.DGRAY, 3]
+        expected[4][0:2] = [Game.DGRAY, 6]
+        expected[5][0] = Game.DGRAY
+        expected[6][0:2] = [Game.DGRAY, 5]
+
+        self.assertEqual(g.board, expected)
+        self.assertEqual(g.score, 17198)
+
 
 if __name__ == '__main__':
     unittest.main()
