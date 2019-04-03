@@ -2,9 +2,10 @@ from functools import reduce
 from random import randint
 import pprint
 
+INITIAL_PIECES = 20 # This is the number dropped the number remaining after pops is unknown
+
 SIZE = 7
 PIECES_PER_ROUND = 5
-
 
 # TODO deal with not having enough of these figured out
 CHAIN_MULTIPLIERS = [7, 39, 109, 224, 391, 617, 907, 1267,
@@ -13,21 +14,31 @@ ROUND_BONUS = 17000  # Granted each time a round is finished
 EMPTY_BOARD_BONUS = 70000  # Granted if the player ever clears the whole board
 
 
-# Some implementation details
-#
-# Board is always a square unless its game over and then the piece(s) that bust are still on those columns
+# Note: Board is always a square unless its game over and then the piece(s) that bust are still on those columns
 class Game:
     # Implementation assumptions rely on empty being 0, grays being less than 0 and pieces being greater
     EMPTY = 0
     GRAY = -1
     DGRAY = -2
 
-    # TODO drop some pieces initially
     def __init__(self):
         self.board = []  # indexed board[column][row]
         for i in range(SIZE):
             self.board.append([self.EMPTY] * SIZE)
         self.nextPiece = self.getPiece()
+
+        # Populate with initial pieces
+        self.score = 0
+        self.piecesInRound = INITIAL_PIECES + 1
+
+        initial = 0
+        while initial < INITIAL_PIECES:
+            move = randint(0, 6)
+            if not self.canMove(move):
+                continue
+            self.move(move)
+            initial += 1
+
         self.score = 0
         self.piecesInRound = PIECES_PER_ROUND
 
