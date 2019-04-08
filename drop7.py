@@ -1,6 +1,5 @@
 from functools import reduce
 from random import randint
-import pprint
 
 INITIAL_PIECES = 20 # This is the number dropped the number remaining after pops is unknown
 
@@ -192,6 +191,32 @@ class Game:
 
         return count
 
-    def printBoard(self):
-        pp = pprint.PrettyPrinter(indent=2)
-        pp.pprint(self.board)
+    def print(self):
+        from termcolor import colored
+        colorMap = {
+            1: 'green',
+            2: 'yellow',
+            3: 'white',
+            4: 'red',
+            5: 'magenta',
+            6: 'cyan',
+            7: 'blue' }
+        
+        print("Score: " + str(self.score))
+        print("*" * self.piecesInRound)
+        print("Next Piece: " + str(self.nextPiece))
+        for r in reversed(range(SIZE)):
+            row = "|"
+            for c in range(SIZE):
+                val = self.board[c][r]
+                if val > 0:
+                    row += colored(str(val), colorMap[val])
+                elif val == 0:
+                    row += " "
+                elif val == Game.GRAY:
+                    row += colored("X", "white")
+                else: # DOUBLE GRAY
+                    row += colored("O", "white", attrs=['bold'])
+            row += "|"
+            print(row)
+        print("---------")
