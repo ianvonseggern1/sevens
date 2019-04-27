@@ -191,7 +191,7 @@ class Game:
 
         return count
 
-    def print(self):
+    def printBoard(self):
         from termcolor import colored
         colorMap = {
             1: 'green',

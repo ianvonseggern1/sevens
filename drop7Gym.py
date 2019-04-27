@@ -52,6 +52,6 @@ class drop7Gym(gym.Env):
 
     def render(self, mode='human'):
         if mode is 'human':
-            self.print()
+            self.printBoard()
         else:
             super(drop7Gym, self).render(mode=mode)
