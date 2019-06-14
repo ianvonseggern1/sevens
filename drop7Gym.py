@@ -4,6 +4,7 @@ import drop7
 
 from numpy import array
 
+
 class drop7Gym(gym.Env):
     def __init__(self):
         self.game = drop7.Game()
@@ -18,9 +19,9 @@ class drop7Gym(gym.Env):
         # 0 is empty
         # 1-7 are themselves
         self.observation_space = gym.spaces.Dict({
-                "nextPiece": gym.spaces.Discrete(7), 
-                "board": gym.spaces.Box(low=-2, high=7, shape=(7,7), dtype=int),
-                "piecesInRound": gym.spaces.Discrete(5)})
+            "nextPiece": gym.spaces.Discrete(7),
+            "board": gym.spaces.Box(low=-2, high=7, shape=(7, 7), dtype=int),
+            "piecesInRound": gym.spaces.Discrete(5)})
 
     # Returns (observation, reward, done)
     def step(self, action):
@@ -28,7 +29,7 @@ class drop7Gym(gym.Env):
             observation = {
                 "nextPiece": self.game.nextPiece,
                 "board": array(self.game.board),
-                "piecesInRound": self.game.piecesInRound }
+                "piecesInRound": self.game.piecesInRound}
             return (observation, 0, False)
 
         score_before = self.game.score
@@ -36,7 +37,8 @@ class drop7Gym(gym.Env):
         observation = {
             "nextPiece": self.game.nextPiece,
             "board": array(self.game.board),
-            "piecesInRound": self.game.piecesInRound }
+            "piecesInRound": self.game.piecesInRound}
+        print("Step: ")
         print(observation)
         return (observation, self.game.score - score_before, self.game.isGameOver())
 
@@ -45,7 +47,7 @@ class drop7Gym(gym.Env):
         observation = {
             "nextPiece": self.game.nextPiece,
             "board": array(self.game.board),
-            "piecesInRound": self.game.piecesInRound }
+            "piecesInRound": self.game.piecesInRound}
         print("Reset: ")
         print(observation)
         return observation

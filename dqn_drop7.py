@@ -15,15 +15,15 @@ from rl.processors import MultiInputProcessor
 
 # Get the environment and extract the number of actions.
 #env = gym.make(ENV_NAME)
-#np.random.seed(123)
-#env.seed(123)
-nb_actions = 7#env.action_space.n
+# np.random.seed(123)
+# env.seed(123)
+nb_actions = 7  # env.action_space.n
 env = drop7Gym.drop7Gym()
 
 # Next, we build a very simple model.
 model_board = Sequential()
-model_board.add(Flatten(input_shape=(7,7), name='board'))
-model_board_input = Input(shape=(7,7), name='board')
+model_board.add(Flatten(input_shape=(7, 7), name='board'))
+model_board_input = Input(shape=(7, 7), name='board')
 model_board_encoded = model_board(model_board_input)
 
 model_nextPiece = Sequential()
@@ -32,17 +32,26 @@ model_nextPiece_input = Input(shape=(1, 1), name='nextPiece')
 model_nextPiece_encoded = model_nextPiece(model_nextPiece_input)
 
 model_piecesInRound = Sequential()
-model_piecesInRound.add(Flatten(input_shape=(1,1), name='piecesInRound'))
-model_piecesInRound_input = Input(shape=(1,1), name='piecesInRound')
+model_piecesInRound.add(Flatten(input_shape=(1, 1), name='piecesInRound'))
+model_piecesInRound_input = Input(shape=(1, 1), name='piecesInRound')
 model_piecesInRound_encoded = model_piecesInRound(model_piecesInRound_input)
 
-con = concatenate([model_board_encoded, model_nextPiece_encoded, model_piecesInRound_encoded])
+inputs = [
+    model_board_input,
+    #    model_nextPiece_input,
+    #    model_piecesInRound_input,
+]
+# input_layers = concatenate([
+#     model_board_encoded,
+#     model_nextPiece_encoded,
+#     model_piecesInRound_encoded,
+# ])
 
-hidden = Dense(16, activation='relu')(con)
-for _ in range(2): 
-	hidden = Dense(16, activation='relu')(hidden)
-output = Dense(nb_actions, activation='linear')(hidden)
-model_final = Model(inputs=[model_board_input, model_nextPiece_input, model_piecesInRound_input], outputs=output)
+hidden_1 = Dense(16, activation='relu')(model_board)  # input_layers)
+hidden_2 = Dense(16, activation='relu')(hidden_1)
+hidden_3 = Dense(16, activation='relu')(hidden_2)
+output = Dense(nb_actions, activation='linear')(hidden_3)
+model_final = Model(inputs=inputs, outputs=output)
 print(model_final.summary())
 #plot_model(model_final, to_file='model.png')
 
