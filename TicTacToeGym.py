@@ -13,7 +13,8 @@ class TicTacToeGym(gym.Env):
         # 0 1 2
         # 3 4 5
         # 6 7 8
-        self.action_space = gym.spaces.Discrete(9)
+        self.action_space = gym.spaces.MultiDiscrete(
+            [2, 2, 2, 2, 2, 2, 2, 2, 2])
 
         # -1 is opponents piece, 1 is our piece, 0 is empty
         self.observation_space = gym.spaces.Box(
@@ -24,11 +25,13 @@ class TicTacToeGym(gym.Env):
     # Returns 100 for a victory -100 for a loss and 0 for a tie
     def step(self, action):
         info = {"items": []}
+        #print("HELLO ACTION")
+        # print(action)
 
         row = action // 3
         col = action % 3
         if self.board[row][col] != 0:
-            return (self.board, -1, False, info)
+            return (self.board, -5, False, info)
 
         self.board[row][col] = 1
         isGameOver, winner = self.isGameOver()
