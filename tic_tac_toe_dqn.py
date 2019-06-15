@@ -51,8 +51,8 @@ def handleEpochEnd(epoch, logs):
     global epochs
     total_reward += logs['episode_reward']
     epochs += 1
-    if epochs == 1000:
-        metrics.send_metric("reward", total_reward / 1000)
+    if epochs == 100:
+        metrics.send_metric("reward", total_reward / 100)
         epochs = 0
         total_reward = 0
 
