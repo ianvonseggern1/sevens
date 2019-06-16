@@ -25,11 +25,11 @@ nb_actions = 9  # env.action_space.n
 # Next, we build a very simple model.
 model = Sequential()
 model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-model.add(Dense(81))
+model.add(Dense(512))
 model.add(Activation('relu'))
-model.add(Dense(16))
+model.add(Dense(64))
 model.add(Activation('relu'))
-model.add(Dense(16))
+model.add(Dense(64))
 model.add(Activation('relu'))
 model.add(Dense(nb_actions))
 model.add(Activation('softmax'))
@@ -44,19 +44,24 @@ dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmu
 dqn.compile(Adam(lr=1e-3), metrics=['mae'])
 
 # Create spell metrics callback
-total_reward = 0
+reward_avg_100 = 0
+reward_avg_1000 = 0
 epochs = 0
 
 
 def handleEpochEnd(epoch, logs):
-    global total_reward
+    global reward_avg_100
+    global reward_avg_1000
     global epochs
-    total_reward += logs['episode_reward']
+    reward_avg_100 += logs['episode_reward']
+    reward_avg_1000 += logs['episode_reward']
     epochs += 1
-    if epochs == 100:
-        metrics.send_metric("reward", total_reward / 100)
-        epochs = 0
-        total_reward = 0
+    if epochs % 100 == 0:
+        metrics.send_metric("reward_last_100", reward_avg_100 / 100)
+        reward_avg_100 = 0
+    if epochs % 1000 == 0:
+        metrics.send_metric("reward_last_1000", reward_avg_1000 / 1000)
+        reward_avg_1000 = 0
 
 
 metrics_callback = LambdaCallback(
@@ -65,7 +70,7 @@ metrics_callback = LambdaCallback(
 # Okay, now it's time to learn something! We visualize the training here for show, but this
 # slows down training quite a lot. You can always safely abort the training prematurely using
 # Ctrl + C.
-dqn.fit(env, nb_steps=5000000, visualize=False,
+dqn.fit(env, nb_steps=200000, visualize=False,
         verbose=1, callbacks=[metrics_callback])
 
 # After training is done, we save the final weights.
