@@ -26,14 +26,11 @@ nb_actions = 9  # env.action_space.n
 def get_dqn():
     model = Sequential()
     model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-    model.add(Dense(512))
-    model.add(Activation('relu'))
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dense(64))
-    model.add(Activation('relu'))
-    model.add(Dense(nb_actions))
-    model.add(Activation('softmax'))
+    model.add(Dense(512, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dense(64, activation='relu'))
+    model.add(Dropout(0.3))
+    model.add(Dense(nb_actions, activation='softmax'))
     print(model.summary())
 
     # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
