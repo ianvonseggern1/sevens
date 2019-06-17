@@ -4,7 +4,7 @@ import gym
 
 from keras.callbacks import LambdaCallback
 from keras.models import Sequential
-from keras.layers import Dense, Activation, Flatten
+from keras.layers import Dense, Activation, Flatten, Dropout
 from keras.optimizers import Adam
 
 from rl.agents.dqn import DQNAgent
