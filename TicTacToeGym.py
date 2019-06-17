@@ -38,7 +38,7 @@ class TicTacToeGym(gym.Env):
         if isGameOver:
             return (self.board, winner * 100, True, info)
 
-        self.performOpponentMoveRandom()
+        self.performOpponentMoveSingleLookahead()
         isGameOver, winner = self.isGameOver()
         # (observation, score, isDone, info)
         return (self.board, winner * 100, isGameOver, info)
@@ -102,4 +102,54 @@ class TicTacToeGym(gym.Env):
                 self.board[row][column] = -1
                 return
 
-    # def performOpponentMoveSingleLookahead(self):
+    def performOpponentMoveSingleLookahead(self):
+        lines = [
+            [(0, 0), (0, 1), (0, 2)],
+            [(1, 0), (1, 1), (1, 2)],
+            [(2, 0), (2, 1), (2, 2)],
+            [(0, 0), (1, 0), (2, 0)],
+            [(0, 1), (1, 1), (2, 1)],
+            [(0, 2), (1, 2), (2, 2)],
+            [(0, 0), (1, 1), (2, 2)],
+            [(2, 0), (1, 1), (0, 2)],
+        ]
+        # Opponent looks for a win
+        for l in lines:
+            opp_piece_count = len([(r, c)
+                                   for (r, c) in l if self.board[r][c] == -1])
+            if opp_piece_count != 2:
+                continue
+            open_r, open_c = [(r, c)
+                              for (r, c) in l if self.board[r][c] != 1][0]
+            if self.board[open_r][open_c] == 0:
+                self.board[open_r][open_c] = -1
+                return
+        # Opponent looks for lines where ai has two pieces and the third spot is open
+        for l in lines:
+            ai_piece_count = len([(r, c)
+                                  for (r, c) in l if self.board[r][c] == 1])
+            if ai_piece_count != 2:
+                continue
+            open_r, open_c = [(r, c)
+                              for (r, c) in l if self.board[r][c] != 1][0]
+            if self.board[open_r][open_c] == 0:
+                self.board[open_r][open_c] = -1
+                return
+        # Opponent looks for lines where they have one piece and both other spots are open
+        for l in lines:
+            opp_piece_count = len([(r, c)
+                                   for (r, c) in l if self.board[r][c] == -1])
+            if opp_piece_count != 1:
+                continue
+            open_spots = [(r, c)
+                          for (r, c) in l if self.board[r][c] == 0]
+            if len(open_spots) != 2:
+                continue
+            index = 0
+            if np.random.random() > 0.5:
+                index = 1
+            open_r, open_c = open_spots[index]
+            self.board[open_r][open_c] = -1
+            return
+        # Otherwise pick any open spot
+        self.performOpponentMoveRandom()
