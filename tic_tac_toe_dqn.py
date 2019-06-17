@@ -13,6 +13,18 @@ from rl.memory import SequentialMemory
 
 import spell.metrics as metrics
 
+import argparse
+parser = argparse.ArgumentParser()
+parser.add_argument('--steps', type=int, dest='steps', default=200000)
+parser.add_argument('--learning_rate', type=float,
+                    dest='learning_rate', default=0.0003)
+parser.add_argument('--target_model_update', type=float,
+                    dest='target_model_update', default=0.003)
+parser.add_argument('--layer1', type=int, dest='layer1', default=512)
+parser.add_argument('--layer2', type=int, dest='layer2', default=64)
+parser.add_argument('--layer3', type=int, dest='layer3', default=64)
+parser.add_argument('--dropout', type=float, dest='dropout', default=0.3)
+args = parser.parse_args()
 
 # Concept taken from https://github.com/keras-rl/keras-rl/blob/master/examples/dqn_cartpole.py
 
@@ -23,13 +35,13 @@ env.seed(1234)
 nb_actions = 9  # env.action_space.n
 
 
-def get_dqn():
+def get_dqn(layer1, layer2, layer3, dropout):
     model = Sequential()
     model.add(Flatten(input_shape=(1,) + env.observation_space.shape))
-    model.add(Dense(512, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dense(64, activation='relu'))
-    model.add(Dropout(0.3))
+    model.add(Dense(layer1, activation='relu'))
+    model.add(Dense(layer2, activation='relu'))
+    model.add(Dense(layer3, activation='relu'))
+    model.add(Dropout(dropout))
     model.add(Dense(nb_actions, activation='softmax'))
     print(model.summary())
 
@@ -38,13 +50,13 @@ def get_dqn():
     memory = SequentialMemory(limit=200000, window_length=1)
     policy = BoltzmannQPolicy()
     dqn = DQNAgent(model=model, nb_actions=nb_actions, memory=memory, nb_steps_warmup=10000,
-                   target_model_update=3e-3, policy=policy)
-    dqn.compile(Adam(lr=3e-4), metrics=['mae'])
+                   target_model_update=args.target_model_update, policy=policy)
+    dqn.compile(Adam(lr=args.learning_rate), metrics=['mae'])
     return dqn
 
 
 # Next, we build a very simple model.
-dqn = get_dqn()
+dqn = get_dqn(args.layer1, args.layer2, args.layer3, args.dropout)
 
 
 # Create spell metrics callback
@@ -73,7 +85,7 @@ if __name__ == "__main__":
     # Okay, now it's time to learn something! We visualize the training here for show, but this
     # slows down training quite a lot. You can always safely abort the training prematurely using
     # Ctrl + C.
-    dqn.fit(env, nb_steps=200000, visualize=False,
+    dqn.fit(env, nb_steps=args.steps, visualize=False,
             verbose=1, callbacks=[metrics_callback])
 
     # After training is done, we save the final weights.
