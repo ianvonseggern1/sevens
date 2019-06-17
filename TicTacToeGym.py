@@ -38,7 +38,7 @@ class TicTacToeGym(gym.Env):
         if isGameOver:
             return (self.board, winner * 100, True, info)
 
-        self.performOpponentMove()
+        self.performOpponentMoveRandom()
         isGameOver, winner = self.isGameOver()
         # (observation, score, isDone, info)
         return (self.board, winner * 100, isGameOver, info)
@@ -47,18 +47,22 @@ class TicTacToeGym(gym.Env):
         self.board = np.zeros((3, 3))
         #print("Reset: ")
         # print(self.board)
+        # Choose who goes first randomly
+        if np.random.random() > 0.5:
+            self.performOpponentMoveRandom()
         return self.board
 
     def render(self, mode='human'):
         def getPiece(val):
-            if val is 1:
+            if val == 1:
                 return 'X'
-            if val is -1:
+            if val == -1:
                 return 'O'
             return ' '
         if mode is 'human':
+            print('______')
             for r in range(3):
-                print(' '.join([getPiece(v) for v in self.board[r]]))
+                print('|' + ' '.join([getPiece(v) for v in self.board[r]]))
         else:
             super(TicTacToeGym, self).render(mode=mode)
 
@@ -90,10 +94,12 @@ class TicTacToeGym(gym.Env):
         return (True, 0)
 
     # For now this just moves into a random spot
-    def performOpponentMove(self):
+    def performOpponentMoveRandom(self):
         while True:
             row = np.random.randint(0, 3)
             column = np.random.randint(0, 3)
             if self.board[row][column] == 0:
                 self.board[row][column] = -1
                 return
+
+    # def performOpponentMoveSingleLookahead(self):
