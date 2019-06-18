@@ -42,7 +42,7 @@ def get_dqn(layer1, layer2, layer3, dropout):
     model.add(Dense(layer2, activation='relu'))
     model.add(Dense(layer3, activation='relu'))
     model.add(Dropout(dropout))
-    model.add(Dense(nb_actions, activation='softmax'))
+    model.add(Dense(nb_actions, activation='linear'))
     print(model.summary())
 
     # Finally, we configure and compile our agent. You can use every built-in Keras optimizer and
