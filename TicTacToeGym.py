@@ -120,7 +120,7 @@ class TicTacToeGym(gym.Env):
             if opp_piece_count != 2:
                 continue
             open_r, open_c = [(r, c)
-                              for (r, c) in l if self.board[r][c] != 1][0]
+                              for (r, c) in l if self.board[r][c] != -1][0]
             if self.board[open_r][open_c] == 0:
                 self.board[open_r][open_c] = -1
                 return
