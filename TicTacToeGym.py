@@ -103,6 +103,10 @@ class TicTacToeGym(gym.Env):
                 return
 
     def performOpponentMoveSingleLookahead(self):
+        # 5 percent of the time introduce random behavior
+        if np.random.random() > 0.95:
+            self.performOpponentMoveRandom()
+            return
         lines = [
             [(0, 0), (0, 1), (0, 2)],
             [(1, 0), (1, 1), (1, 2)],
